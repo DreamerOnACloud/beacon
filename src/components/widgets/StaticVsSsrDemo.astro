@@ -1,27 +1,65 @@
 ---
 import Playground from '../Playground.astro';
+
+// Astro's dev server live-renders every route on every request (there's no
+// build-time freeze until a real build runs), so the flyer pane will
+// incorrectly print a new copy here too. `astro preview` can't stand in for
+// a real check either — the Netlify adapter doesn't support it. The
+// distinction this demo makes only actually appears once deployed.
+const isDev = import.meta.env.DEV;
 ---
 
-<Playground label="Try it — reload each pane and compare">
+<Playground label="Try it — a flyer vs. a receipt">
+	{
+		isDev && (
+			<p class="dev-note">
+				Note: in local dev, the flyer will incorrectly print a{' '}
+				<strong>new copy</strong> every time too — Astro's dev server
+				live-renders every route, so nothing is actually printed in advance
+				until a real deployment. Reload here to see the UI work, but trust the
+				difference only once this is live.
+			</p>
+		)
+	}
 	<div class="ssr-demo" data-ssr-demo>
 		<div class="pane">
 			<div class="pane-header">
-				<span>Static page</span>
+				<span>📄 Flyer</span>
 				<button type="button" data-target="static">Reload</button>
 			</div>
-			<iframe title="Statically rendered page" data-frame="static" src="/demos/static-render/"></iframe>
+			<p class="pane-caption">Photocopied once, in advance — everyone gets the same one.</p>
+			<iframe title="The flyer" data-frame="static" src="/demos/static-render/"></iframe>
+			<div class="pane-status">
+				<span class="badge" data-badge="static">first copy</span>
+				<span class="history" data-history="static"></span>
+			</div>
 		</div>
 		<div class="pane">
 			<div class="pane-header">
-				<span>Server-rendered page</span>
+				<span>🧾 Receipt</span>
 				<button type="button" data-target="ssr">Reload</button>
 			</div>
-			<iframe title="Server-rendered page" data-frame="ssr" src="/demos/ssr-render/"></iframe>
+			<p class="pane-caption">Printed fresh, just for this request — every time.</p>
+			<iframe title="The receipt" data-frame="ssr" src="/demos/ssr-render/"></iframe>
+			<div class="pane-status">
+				<span class="badge" data-badge="ssr">first receipt</span>
+				<span class="history" data-history="ssr"></span>
+			</div>
 		</div>
 	</div>
 </Playground>
 
 <style>
+	.dev-note {
+		margin: 0 0 1rem;
+		padding: 0.5rem 0.75rem;
+		border: 1px solid var(--sl-color-orange);
+		border-radius: 0.375rem;
+		background-color: var(--sl-color-orange-low);
+		color: var(--sl-color-text);
+		font-size: var(--sl-text-sm);
+	}
+
 	.ssr-demo {
 		display: grid;
 		gap: 1rem;
@@ -60,29 +98,133 @@ import Playground from '../Playground.astro';
 		cursor: pointer;
 	}
 
+	.pane-caption {
+		margin: 0;
+		padding: 0.375rem 0.75rem;
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-3);
+		background-color: var(--sl-color-gray-6);
+		border-top: 1px solid var(--sl-color-hairline);
+	}
+
 	.pane iframe {
 		display: block;
 		width: 100%;
 		height: 8rem;
 		border: none;
 	}
+
+	.pane-status {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+		padding: 0.5rem 0.75rem;
+		border-top: 1px solid var(--sl-color-hairline);
+		background-color: var(--sl-color-gray-6);
+	}
+
+	.badge {
+		padding: 0.125rem 0.5rem;
+		border-radius: 999px;
+		font-size: var(--sl-text-xs);
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+		background-color: var(--sl-color-gray-5);
+		color: var(--sl-color-gray-2);
+	}
+
+	.badge[data-outcome='changed'] {
+		background-color: var(--sl-color-green-low);
+		color: var(--sl-color-green-high);
+	}
+
+	.badge[data-outcome='same'] {
+		background-color: var(--sl-color-orange-low);
+		color: var(--sl-color-orange-high);
+	}
+
+	.history {
+		display: flex;
+		gap: 0.25rem;
+	}
+
+	.history .dot {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 999px;
+		background-color: var(--sl-color-gray-4);
+	}
+
+	.history .dot[data-outcome='changed'] {
+		background-color: var(--sl-color-green);
+	}
+
+	.history .dot[data-outcome='same'] {
+		background-color: var(--sl-color-orange);
+	}
 </style>
 
 <script>
-	function initDemo(root: HTMLElement) {
-		root.querySelectorAll<HTMLButtonElement>('button[data-target]').forEach((button) => {
-			button.addEventListener('click', () => {
-				const frame = root.querySelector<HTMLIFrameElement>(`iframe[data-frame="${button.dataset.target}"]`);
-				if (!frame) return;
-				// Cache-bust so the reload is a genuine new request, not a
-				// browser-cache hit — otherwise even the SSR pane could
-				// appear "static" for the wrong reason.
-				const url = new URL(frame.src, location.href);
-				url.searchParams.set('_', Date.now().toString());
-				frame.src = url.toString();
-			});
+	const HISTORY_LIMIT = 8;
+
+	// Per-pane vocabulary — same comparison logic underneath, different words
+	// so each pane reads as its half of the analogy rather than a generic
+	// "changed/unchanged" status.
+	const LABELS: Record<string, { first: string; same: string; changed: string }> = {
+		static: { first: 'first copy', same: 'same flyer', changed: 'new flyer' },
+		ssr: { first: 'first receipt', same: 'same receipt', changed: 'new receipt' },
+	};
+
+	function initPane(root: HTMLElement, target: string) {
+		const frame = root.querySelector<HTMLIFrameElement>(`iframe[data-frame="${target}"]`);
+		const button = root.querySelector<HTMLButtonElement>(`button[data-target="${target}"]`);
+		const badge = root.querySelector<HTMLElement>(`[data-badge="${target}"]`);
+		const history = root.querySelector<HTMLElement>(`[data-history="${target}"]`);
+		const labels = LABELS[target];
+		if (!frame || !button || !badge || !history || !labels) return;
+
+		let lastToken: string | null = null;
+		const outcomes: Array<'same' | 'changed'> = [];
+
+		function renderHistory() {
+			if (!history) return;
+			history.innerHTML = outcomes
+				.slice(-HISTORY_LIMIT)
+				.map((outcome) => `<span class="dot" data-outcome="${outcome}"></span>`)
+				.join('');
+		}
+
+		frame.addEventListener('load', () => {
+			const token = frame!.contentDocument?.querySelector('.token')?.textContent?.trim() ?? null;
+
+			if (lastToken === null) {
+				badge!.textContent = labels.first;
+				badge!.removeAttribute('data-outcome');
+			} else {
+				const outcome: 'same' | 'changed' = token === lastToken ? 'same' : 'changed';
+				outcomes.push(outcome);
+				badge!.textContent = outcome === 'same' ? labels.same : labels.changed;
+				badge!.dataset.outcome = outcome;
+				renderHistory();
+			}
+
+			lastToken = token;
+		});
+
+		button.addEventListener('click', () => {
+			// Cache-bust so the reload is a genuine new request, not a
+			// browser-cache hit — otherwise even the SSR pane could
+			// appear "static" for the wrong reason.
+			const url = new URL(frame!.src, location.href);
+			url.searchParams.set('_', Date.now().toString());
+			frame!.src = url.toString();
 		});
 	}
 
-	document.querySelectorAll<HTMLElement>('[data-ssr-demo]').forEach(initDemo);
+	document.querySelectorAll<HTMLElement>('[data-ssr-demo]').forEach((root) => {
+		initPane(root, 'static');
+		initPane(root, 'ssr');
+	});
 </script>

@@ -13,7 +13,7 @@ const token = Math.random().toString(36).slice(2, 8);
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Server-rendered</title>
+		<title>Receipt</title>
 		<style>
 			body {
 				margin: 0;
@@ -42,8 +42,8 @@ const token = Math.random().toString(36).slice(2, 8);
 		</style>
 	</head>
 	<body>
-		<p class="label">Server-rendered — this request</p>
-		<p class="value">{renderedAt}</p>
-		<p class="token">token: {token}</p>
+		<p class="label">Receipt — printed for you, just now</p>
+		<p class="value">Printed at: {renderedAt}</p>
+		<p class="token">Receipt #: {token}</p>
 	</body>
 </html>

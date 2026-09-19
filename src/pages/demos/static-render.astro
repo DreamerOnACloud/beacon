@@ -11,7 +11,7 @@ const token = Math.random().toString(36).slice(2, 8);
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Static render</title>
+		<title>Flyer</title>
 		<style>
 			body {
 				margin: 0;
@@ -40,8 +40,8 @@ const token = Math.random().toString(36).slice(2, 8);
 		</style>
 	</head>
 	<body>
-		<p class="label">Static — rendered at build time</p>
-		<p class="value">{renderedAt}</p>
-		<p class="token">token: {token}</p>
+		<p class="label">Flyer — photocopied once, in advance</p>
+		<p class="value">Printed at: {renderedAt}</p>
+		<p class="token">Copy #: {token}</p>
 	</body>
 </html>

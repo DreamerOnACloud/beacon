@@ -14,4 +14,8 @@ export default defineConfig({
 		}),
 	],
 	adapter: netlify(),
+	// Off: the dev toolbar breaks when one Astro dev page is iframed inside
+	// another (as the SSR demo does), throwing an unhandled rejection instead
+	// of rendering. Not worth the toolbar's convenience for this site.
+	devToolbar: { enabled: false },
 });

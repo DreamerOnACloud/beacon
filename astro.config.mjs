@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import netlify from '@astrojs/netlify';
 
 // https://astro.build/config
 export default defineConfig({
@@ -12,4 +13,9 @@ export default defineConfig({
 			sidebar: [{ label: 'Posts', items: [{ autogenerate: { directory: 'posts' } }] }],
 		}),
 	],
+	adapter: netlify(),
+	// Off: the dev toolbar breaks when one Astro dev page is iframed inside
+	// another (as the SSR demo does), throwing an unhandled rejection instead
+	// of rendering. Not worth the toolbar's convenience for this site.
+	devToolbar: { enabled: false },
 });

@@ -6,12 +6,34 @@ tags: [Software Engineering, Math]
 
 import IdempotentPaymentDemo from '../../../components/widgets/IdempotentPaymentDemo.astro';
 
-{/* TODO: write the concept explanation here. The core idea: an operation is
-idempotent if applying it multiple times has the same effect as applying it
-once. Keep it tool-agnostic where the concept doesn't require a specific
-tool — this can be framed purely in terms of "repeating an action safely",
-before the demo below grounds it in the concrete case of retrying a
-payment request. */}
+{/* DRAFT — written by Claude as a one-off exception at the author's request.
+Review and rewrite in your own words; this is a starting point, not the
+final text. */}
+
+An operation is **idempotent** if doing it many times has the same effect as
+doing it once. Repetition doesn't add anything extra, and it doesn't cause
+harm — it just confirms what was already true.
+
+The clearest version of this is a small piece of math: a function `f` is
+idempotent if `f(f(x)) = f(x)` for every `x`. A few everyday examples:
+
+- **Absolute value.** `abs(abs(-5))` is `5` — the same as `abs(-5)`. Once a
+  number is non-negative, taking the absolute value again changes nothing.
+- **Rounding.** Rounding an already-rounded number gives back that same
+  number. The second rounding has nothing left to do.
+- **Sorting.** Sorting an already-sorted list produces the identical list.
+  There's no "more sorted" to reach.
+
+In each case, the first application moves something into a state, and every
+application after that just re-confirms it's already there.
+
+Software has the same property, just applied to actions instead of pure
+functions: an operation is idempotent if performing it several times leaves
+the system in the same state as performing it once. This matters most when
+an action might accidentally happen more than once — a button clicked
+twice, a request that times out and gets retried, a message that gets
+redelivered. If the underlying operation is idempotent, none of that is
+dangerous. If it isn't, every accidental repeat is a bug waiting to happen.
 
 ## Try it
 

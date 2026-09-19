@@ -1,0 +1,49 @@
+---
+// This is the one export that makes the difference: it opts this single
+// route out of static prerendering, so the Netlify adapter runs it as a
+// server function on every request instead of baking it in at build time.
+export const prerender = false;
+
+const renderedAt = new Date().toISOString();
+const token = Math.random().toString(36).slice(2, 8);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Server-rendered</title>
+		<style>
+			body {
+				margin: 0;
+				padding: 1rem;
+				font-family: system-ui, sans-serif;
+				background: #1a2e1e;
+				color: #e0e0e0;
+			}
+			.label {
+				margin: 0 0 0.5rem;
+				font-size: 0.75rem;
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+				color: #88aa88;
+			}
+			.value {
+				margin: 0;
+				font-size: 1.1rem;
+				font-variant-numeric: tabular-nums;
+			}
+			.token {
+				margin: 0.5rem 0 0;
+				font-family: ui-monospace, monospace;
+				color: #88aa88;
+			}
+		</style>
+	</head>
+	<body>
+		<p class="label">Server-rendered — this request</p>
+		<p class="value">{renderedAt}</p>
+		<p class="token">token: {token}</p>
+	</body>
+</html>

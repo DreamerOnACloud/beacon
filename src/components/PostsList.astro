@@ -1,0 +1,46 @@
+---
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('docs'))
+	.filter((post) => post.id.startsWith('posts/') && post.id !== 'posts/index')
+	.sort((a, b) => a.data.title.localeCompare(b.data.title));
+---
+
+{
+	posts.length === 0 ? (
+		<p>No posts yet — check back soon.</p>
+	) : (
+		<ul class="posts-list">
+			{posts.map((post) => (
+				<li>
+					<a href={`/${post.id}/`}>{post.data.title}</a>
+					{post.data.description && <p>{post.data.description}</p>}
+				</li>
+			))}
+		</ul>
+	)
+}
+
+<style>
+	.posts-list {
+		list-style: none;
+		padding: 0;
+		display: grid;
+		gap: 1rem;
+	}
+
+	.posts-list li {
+		padding-block: 0.5rem;
+		border-bottom: 1px solid var(--sl-color-hairline);
+	}
+
+	.posts-list a {
+		font-size: var(--sl-text-lg);
+	}
+
+	.posts-list p {
+		margin: 0.25rem 0 0;
+		color: var(--sl-color-gray-3);
+		font-size: var(--sl-text-sm);
+	}
+</style>

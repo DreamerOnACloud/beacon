@@ -8,19 +8,8 @@ export default defineConfig({
 		starlight({
 			title: 'beacon',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/DreamerOnACloud/beacon' }],
-			sidebar: [
-				{
-					label: 'Guides',
-					items: [
-						// Each item here is one entry in the navigation menu.
-						{ label: 'Example Guide', slug: 'guides/example' },
-					],
-				},
-				{
-					label: 'Reference',
-					items: [{ autogenerate: { directory: 'reference' } }],
-				},
-			],
+			// Posts are flat (no per-field folders) — see tags in each post's frontmatter.
+			sidebar: [{ label: 'Posts', items: [{ autogenerate: { directory: 'posts' } }] }],
 		}),
 	],
 });

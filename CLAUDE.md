@@ -10,6 +10,18 @@ astro dev --background
 
 Manage the background server with `astro dev stop`, `astro dev status`, and `astro dev logs`.
 
+## Git
+
+Every commit in this repo is authored and committed solely as Claude, never under a human git identity and never with a `Co-Authored-By` trailer alongside one. Set both author and committer via environment variables on the `git commit` invocation itself — never via `git config` (local or global):
+
+```bash
+GIT_AUTHOR_NAME="Claude Sonnet 5" GIT_AUTHOR_EMAIL="noreply@anthropic.com" \
+GIT_COMMITTER_NAME="Claude Sonnet 5" GIT_COMMITTER_EMAIL="noreply@anthropic.com" \
+git commit -m "..."
+```
+
+When amending, add `--reset-author` (`git commit --amend` otherwise keeps the original author regardless of these env vars).
+
 Consult these guides before working on related tasks:
 
 - [Adding pages, dynamic routes, or middleware](https://docs.astro.build/en/guides/routing/)

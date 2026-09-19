@@ -6,18 +6,35 @@ tags: [Software Engineering, Math]
 
 import IdempotentPaymentDemo from '../../../components/widgets/IdempotentPaymentDemo.astro';
 
-{/* DRAFT — written by Claude as a one-off exception at the author's request.
-Review and rewrite in your own words; this is a starting point, not the
-final text. */}
+## Why
 
-An operation is **idempotent** if doing it many times has the same effect as
-doing it once. Repetition doesn't add anything extra, and it doesn't cause
-harm — it just confirms what was already true.
+{/* TODO: write this section yourself, this is your own encounter with the
+concept, sharpened via interview to these specifics:
+
+- Working on a release pipeline with a colleague, publishing an npm package
+  to your team's npm feed.
+- A pipeline retry hit npm's own rejection of a duplicate version: the
+  exact version already existed on the feed, so `npm publish` failed and
+  the run was marked as failed, even though nothing was actually wrong with
+  the package.
+- Fixed by checking whether the version already exists on the feed *before*
+  publishing, and treating that as success, rather than always calling
+  publish and choking on the "version already exists" error. */}
+
+## The concept
+
+{/* DRAFT, written by Claude. Review and edit before this counts as done;
+per idea.md, whoever didn't draft it is the one who signs off. */}
+
+That's one instance of a more general property. An operation is
+**idempotent** if doing it many times has the same effect as doing it once.
+Repetition doesn't add anything extra, and it doesn't cause harm: it just
+confirms what was already true.
 
 The clearest version of this is a small piece of math: a function `f` is
 idempotent if `f(f(x)) = f(x)` for every `x`. A few everyday examples:
 
-- **Absolute value.** `abs(abs(-5))` is `5` — the same as `abs(-5)`. Once a
+- **Absolute value.** `abs(abs(-5))` is `5`, the same as `abs(-5)`. Once a
   number is non-negative, taking the absolute value again changes nothing.
 - **Rounding.** Rounding an already-rounded number gives back that same
   number. The second rounding has nothing left to do.
@@ -30,21 +47,22 @@ application after that just re-confirms it's already there.
 Software has the same property, just applied to actions instead of pure
 functions: an operation is idempotent if performing it several times leaves
 the system in the same state as performing it once. This matters most when
-an action might accidentally happen more than once — a button clicked
+an action might accidentally happen more than once: a button clicked
 twice, a request that times out and gets retried, a message that gets
-redelivered. If the underlying operation is idempotent, none of that is
-dangerous. If it isn't, every accidental repeat is a bug waiting to happen.
+redelivered, a release step in a pipeline getting re-run. If the underlying
+operation is idempotent, none of that is dangerous. If it isn't, every
+accidental repeat is a bug waiting to happen.
 
 ## Try it
 
 Two accounts start with the same balance. Click "Pay $20" a few times in a
-row — like a user impatiently re-clicking a button that didn't respond fast
-enough — and watch what happens to each.
+row, like a user impatiently re-clicking a button that didn't respond fast
+enough, and watch what happens to each.
 
 <IdempotentPaymentDemo />
 
 ## Further reading
 
-- [Idempotent requests — Stripe API docs](https://docs.stripe.com/api/idempotent_requests) — the industry-standard pattern this post's demo is modeled on: an `Idempotency-Key` header that lets a retried request safely replay the original result instead of repeating the effect.
-- [Idempotent — MDN Web Docs Glossary](https://developer.mozilla.org/en-US/docs/Glossary/Idempotent) — the concise, spec-level definition: why HTTP's GET/PUT/DELETE are idempotent by design and POST isn't.
-- [Idempotence — Wikipedia](https://en.wikipedia.org/wiki/Idempotence) — the general mathematical root of the property (`f(f(x)) = f(x)`), if you want to see the API case as one instance of something broader.
+- [Idempotent requests (Stripe API docs)](https://docs.stripe.com/api/idempotent_requests): the industry-standard pattern this post's demo is modeled on: an `Idempotency-Key` header that lets a retried request safely replay the original result instead of repeating the effect.
+- [Idempotent (MDN Web Docs Glossary)](https://developer.mozilla.org/en-US/docs/Glossary/Idempotent): the concise, spec-level definition: why HTTP's GET/PUT/DELETE are idempotent by design and POST isn't.
+- [Idempotence (Wikipedia)](https://en.wikipedia.org/wiki/Idempotence): the general mathematical root of the property (`f(f(x)) = f(x)`), if you want to see the API case as one instance of something broader.

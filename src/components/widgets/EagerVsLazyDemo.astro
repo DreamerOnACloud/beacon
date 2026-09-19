@@ -2,7 +2,7 @@
 import Playground from '../Playground.astro';
 ---
 
-<Playground label="Try it — eager vs. lazy loading">
+<Playground label="Try it: eager vs. lazy loading">
 	<div class="eager-lazy-demo" data-eager-lazy-demo>
 		<div class="mode-toggle" role="radiogroup" aria-label="Loading mode">
 			<button type="button" data-mode="eager">Eager</button>
@@ -62,7 +62,7 @@ import Playground from '../Playground.astro';
 	/*
 	 * :global() is required below: these elements are injected at runtime via
 	 * innerHTML in the client script, not present in this component's
-	 * build-time template — Astro's CSS scoping only tags elements it renders
+	 * build-time template. Astro's CSS scoping only tags elements it renders
 	 * itself, so unscoped selectors here would silently match nothing.
 	 */
 	:global(.module-row) {
@@ -122,7 +122,7 @@ import Playground from '../Playground.astro';
 		kb: number;
 	}
 
-	// Generic capability names — this isn't about any specific tool or platform,
+	// Generic capability names, this isn't about any specific tool or platform,
 	// just a stand-in for "one procedure among many a system could invoke."
 	const MODULES: ModuleDef[] = [
 		{ name: 'image-resize', kb: 18 },

@@ -2,7 +2,7 @@
 import Playground from '../Playground.astro';
 ---
 
-<Playground label="Try it — click Pay a few times, like an impatient user might">
+<Playground label="Try it: click Pay a few times, like an impatient user might">
 	<div class="idem-demo" data-idem-demo>
 		<div class="controls">
 			<button type="button" data-pay>Pay $20</button>
@@ -158,7 +158,7 @@ import Playground from '../Playground.astro';
 		payButton.addEventListener('click', () => {
 			attempt += 1;
 
-			// "Without a key": every click looks like an unrelated new request —
+			// "Without a key": every click looks like an unrelated new request,
 			// there's nothing to compare it against, so it's always applied.
 			withoutBalance -= CHARGE;
 			withoutBalanceEl!.textContent = String(withoutBalance);
@@ -166,9 +166,9 @@ import Playground from '../Playground.astro';
 
 			// "With a key": this click reuses the SAME key as every other click
 			// in this attempt (a real client would too, since it's retrying the
-			// same logical operation) — so it only actually charges once.
+			// same logical operation), so it only actually charges once.
 			if (processedKeys.has(currentKey)) {
-				logEntry(withLogEl!, 'deduped', `Attempt ${attempt}: skipped — key already processed`);
+				logEntry(withLogEl!, 'deduped', `Attempt ${attempt}: skipped, key already processed`);
 			} else {
 				processedKeys.add(currentKey);
 				withBalance -= CHARGE;

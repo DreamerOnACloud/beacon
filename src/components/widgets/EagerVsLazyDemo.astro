@@ -1,0 +1,225 @@
+---
+import Playground from '../Playground.astro';
+---
+
+<Playground label="Try it — eager vs. lazy loading">
+	<div class="eager-lazy-demo" data-eager-lazy-demo>
+		<div class="mode-toggle" role="radiogroup" aria-label="Loading mode">
+			<button type="button" data-mode="eager">Eager</button>
+			<button type="button" data-mode="lazy" aria-pressed="true">Lazy</button>
+		</div>
+
+		<p class="totals">
+			Loaded <strong data-loaded-kb>0</strong> KB of <strong data-total-kb>0</strong> KB
+			(<span data-loaded-count>0</span>/<span data-module-count>0</span> modules)
+		</p>
+
+		<ul class="module-list" data-module-list></ul>
+
+		<button type="button" class="reset" data-reset>Reset</button>
+	</div>
+</Playground>
+
+<style>
+	.mode-toggle {
+		display: inline-flex;
+		gap: 0.25rem;
+		margin-bottom: 1rem;
+		padding: 0.25rem;
+		border-radius: 0.375rem;
+		background-color: var(--sl-color-gray-6);
+	}
+
+	.mode-toggle button {
+		padding: 0.25rem 0.75rem;
+		border: none;
+		border-radius: 0.25rem;
+		background: transparent;
+		color: var(--sl-color-text);
+		font: inherit;
+		font-size: var(--sl-text-sm);
+		cursor: pointer;
+	}
+
+	.mode-toggle button[aria-pressed='true'] {
+		background-color: var(--sl-color-accent);
+		color: var(--sl-color-text-invert);
+	}
+
+	.totals {
+		font-size: var(--sl-text-sm);
+		margin-block: 0 1rem;
+	}
+
+	.module-list {
+		display: grid;
+		gap: 0.375rem;
+		list-style: none;
+		margin: 0 0 1rem;
+		padding: 0;
+	}
+
+	/*
+	 * :global() is required below: these elements are injected at runtime via
+	 * innerHTML in the client script, not present in this component's
+	 * build-time template — Astro's CSS scoping only tags elements it renders
+	 * itself, so unscoped selectors here would silently match nothing.
+	 */
+	:global(.module-row) {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		padding: 0.375rem 0.625rem;
+		border: 1px solid var(--sl-color-hairline);
+		border-radius: 0.375rem;
+		background-color: var(--sl-color-bg);
+		font-size: var(--sl-text-sm);
+		transition: background-color 0.2s ease;
+	}
+
+	:global(.module-row[data-loaded='true']) {
+		background-color: var(--sl-color-green-low);
+		border-color: var(--sl-color-green);
+	}
+
+	:global(.module-row .size) {
+		color: var(--sl-color-gray-3);
+		font-size: var(--sl-text-xs);
+	}
+
+	:global(.module-row button) {
+		padding: 0.125rem 0.625rem;
+		border: 1px solid var(--sl-color-hairline);
+		border-radius: 0.25rem;
+		background-color: var(--sl-color-gray-5);
+		color: var(--sl-color-text);
+		font: inherit;
+		font-size: var(--sl-text-xs);
+		cursor: pointer;
+	}
+
+	:global(.module-row button:disabled) {
+		opacity: 0.5;
+		cursor: default;
+	}
+
+	.reset {
+		padding: 0.25rem 0.75rem;
+		border: 1px solid var(--sl-color-hairline);
+		border-radius: 0.25rem;
+		background: transparent;
+		color: var(--sl-color-text);
+		font: inherit;
+		font-size: var(--sl-text-sm);
+		cursor: pointer;
+	}
+</style>
+
+<script>
+	interface ModuleDef {
+		name: string;
+		kb: number;
+	}
+
+	// Generic capability names — this isn't about any specific tool or platform,
+	// just a stand-in for "one procedure among many a system could invoke."
+	const MODULES: ModuleDef[] = [
+		{ name: 'image-resize', kb: 18 },
+		{ name: 'pdf-export', kb: 24 },
+		{ name: 'csv-parse', kb: 9 },
+		{ name: 'video-transcode', kb: 41 },
+		{ name: 'spell-check', kb: 15 },
+		{ name: 'currency-convert', kb: 6 },
+		{ name: 'geo-lookup', kb: 22 },
+		{ name: 'qr-generate', kb: 8 },
+		{ name: 'markdown-render', kb: 12 },
+		{ name: 'unit-convert', kb: 5 },
+		{ name: 'color-convert', kb: 7 },
+		{ name: 'diff-viewer', kb: 19 },
+	];
+
+	function initDemo(root: HTMLElement) {
+		let mode: 'eager' | 'lazy' = 'lazy';
+		const loaded = new Set<number>();
+
+		const modeButtons = root.querySelectorAll<HTMLButtonElement>('[data-mode]');
+		const list = root.querySelector<HTMLUListElement>('[data-module-list]');
+		const loadedKbEl = root.querySelector('[data-loaded-kb]');
+		const totalKbEl = root.querySelector('[data-total-kb]');
+		const loadedCountEl = root.querySelector('[data-loaded-count]');
+		const moduleCountEl = root.querySelector('[data-module-count]');
+		const resetButton = root.querySelector<HTMLButtonElement>('[data-reset]');
+
+		if (!list || !loadedKbEl || !totalKbEl || !loadedCountEl || !moduleCountEl || !resetButton) return;
+
+		const totalKb = MODULES.reduce((sum, m) => sum + m.kb, 0);
+		totalKbEl.textContent = String(totalKb);
+		moduleCountEl.textContent = String(MODULES.length);
+
+		function render() {
+			const loadedKb = MODULES.reduce((sum, m, i) => (loaded.has(i) ? sum + m.kb : sum), 0);
+			loadedKbEl!.textContent = String(loadedKb);
+			loadedCountEl!.textContent = String(loaded.size);
+
+			list!.querySelectorAll<HTMLLIElement>('[data-module-row]').forEach((row) => {
+				const i = Number(row.dataset.index);
+				const isLoaded = loaded.has(i);
+				row.dataset.loaded = String(isLoaded);
+				const btn = row.querySelector<HTMLButtonElement>('button');
+				if (btn) {
+					btn.disabled = mode === 'eager' || isLoaded;
+					btn.textContent = isLoaded ? 'loaded' : 'invoke';
+				}
+			});
+
+			modeButtons.forEach((btn) => {
+				btn.setAttribute('aria-pressed', String(btn.dataset.mode === mode));
+			});
+		}
+
+		function loadModule(i: number) {
+			loaded.add(i);
+			render();
+		}
+
+		list.innerHTML = MODULES.map(
+			(m, i) => `
+				<li class="module-row" data-module-row data-index="${i}">
+					<span>${m.name} <span class="size">${m.kb} KB</span></span>
+					<button type="button">invoke</button>
+				</li>
+			`
+		).join('');
+
+		list.addEventListener('click', (event) => {
+			const btn = (event.target as HTMLElement).closest('button');
+			const row = (event.target as HTMLElement).closest<HTMLLIElement>('[data-module-row]');
+			if (!btn || !row || mode === 'eager') return;
+			loadModule(Number(row.dataset.index));
+		});
+
+		modeButtons.forEach((btn) => {
+			btn.addEventListener('click', () => {
+				mode = btn.dataset.mode as 'eager' | 'lazy';
+				loaded.clear();
+				if (mode === 'eager') {
+					MODULES.forEach((_, i) => loaded.add(i));
+				}
+				render();
+			});
+		});
+
+		resetButton.addEventListener('click', () => {
+			loaded.clear();
+			if (mode === 'eager') {
+				MODULES.forEach((_, i) => loaded.add(i));
+			}
+			render();
+		});
+
+		render();
+	}
+
+	document.querySelectorAll<HTMLElement>('[data-eager-lazy-demo]').forEach(initDemo);
+</script>

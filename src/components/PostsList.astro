@@ -8,7 +8,7 @@ const posts = (await getCollection('docs'))
 
 {
 	posts.length === 0 ? (
-		<p>No posts yet — check back soon.</p>
+		<p>No posts yet, check back soon.</p>
 	) : (
 		<ul class="posts-list">
 			{posts.map((post) => (

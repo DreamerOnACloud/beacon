@@ -1,0 +1,186 @@
+---
+import Playground from '../Playground.astro';
+---
+
+<Playground label="Try it: click Pay a few times, like an impatient user might">
+	<div class="idem-demo" data-idem-demo>
+		<div class="controls">
+			<button type="button" data-pay>Pay $20</button>
+			<button type="button" data-reset>Reset</button>
+			<p class="key-line">This attempt's idempotency key: <code data-key></code></p>
+		</div>
+		<div class="accounts">
+			<div class="account">
+				<div class="account-header">With idempotency key</div>
+				<p class="balance">Balance: $<span data-balance="with">100</span></p>
+				<ol class="log" data-log="with"></ol>
+			</div>
+			<div class="account">
+				<div class="account-header">Without idempotency key</div>
+				<p class="balance">Balance: $<span data-balance="without">100</span></p>
+				<ol class="log" data-log="without"></ol>
+			</div>
+		</div>
+	</div>
+</Playground>
+
+<style>
+	.controls {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.75rem;
+		margin-bottom: 1rem;
+	}
+
+	.controls button {
+		padding: 0.375rem 0.875rem;
+		border: 1px solid var(--sl-color-hairline);
+		border-radius: 0.25rem;
+		background-color: var(--sl-color-gray-5);
+		color: var(--sl-color-text);
+		font: inherit;
+		font-size: var(--sl-text-sm);
+		cursor: pointer;
+	}
+
+	.controls button[data-pay] {
+		background-color: var(--sl-color-accent);
+		color: var(--sl-color-text-invert);
+		border-color: transparent;
+	}
+
+	.key-line {
+		margin: 0;
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-3);
+	}
+
+	.key-line code {
+		font-family: ui-monospace, monospace;
+	}
+
+	.accounts {
+		display: grid;
+		gap: 1rem;
+		grid-template-columns: 1fr 1fr;
+	}
+
+	@media (max-width: 640px) {
+		.accounts {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.account {
+		border: 1px solid var(--sl-color-hairline);
+		border-radius: 0.375rem;
+		overflow: hidden;
+	}
+
+	.account-header {
+		padding: 0.5rem 0.75rem;
+		background-color: var(--sl-color-gray-5);
+		font-size: var(--sl-text-sm);
+		font-weight: 600;
+	}
+
+	.balance {
+		margin: 0;
+		padding: 0.75rem;
+		font-size: var(--sl-text-lg);
+		font-variant-numeric: tabular-nums;
+		border-bottom: 1px solid var(--sl-color-hairline);
+	}
+
+	.log {
+		margin: 0;
+		padding: 0.5rem 0.75rem 0.75rem 1.5rem;
+		min-height: 2rem;
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-2);
+	}
+
+	.log li[data-outcome='deduped'] {
+		color: var(--sl-color-orange-high);
+	}
+
+	.log li[data-outcome='charged'] {
+		color: var(--sl-color-text);
+	}
+</style>
+
+<script>
+	const STARTING_BALANCE = 100;
+	const CHARGE = 20;
+
+	function randomKey(): string {
+		return Math.random().toString(36).slice(2, 10);
+	}
+
+	function initDemo(root: HTMLElement) {
+		const payButton = root.querySelector<HTMLButtonElement>('[data-pay]');
+		const resetButton = root.querySelector<HTMLButtonElement>('[data-reset]');
+		const keyEl = root.querySelector<HTMLElement>('[data-key]');
+		const withBalanceEl = root.querySelector<HTMLElement>('[data-balance="with"]');
+		const withoutBalanceEl = root.querySelector<HTMLElement>('[data-balance="without"]');
+		const withLogEl = root.querySelector<HTMLOListElement>('[data-log="with"]');
+		const withoutLogEl = root.querySelector<HTMLOListElement>('[data-log="without"]');
+		if (!payButton || !resetButton || !keyEl || !withBalanceEl || !withoutBalanceEl || !withLogEl || !withoutLogEl)
+			return;
+
+		let currentKey = '';
+		let withBalance = STARTING_BALANCE;
+		let withoutBalance = STARTING_BALANCE;
+		let processedKeys: Set<string> = new Set();
+		let attempt = 0;
+
+		function logEntry(list: HTMLOListElement, outcome: 'charged' | 'deduped', text: string) {
+			const li = document.createElement('li');
+			li.dataset.outcome = outcome;
+			li.textContent = text;
+			list.appendChild(li);
+		}
+
+		function reset() {
+			currentKey = randomKey();
+			withBalance = STARTING_BALANCE;
+			withoutBalance = STARTING_BALANCE;
+			processedKeys = new Set();
+			attempt = 0;
+			keyEl!.textContent = currentKey;
+			withBalanceEl!.textContent = String(withBalance);
+			withoutBalanceEl!.textContent = String(withoutBalance);
+			withLogEl!.innerHTML = '';
+			withoutLogEl!.innerHTML = '';
+		}
+
+		payButton.addEventListener('click', () => {
+			attempt += 1;
+
+			// "Without a key": every click looks like an unrelated new request,
+			// there's nothing to compare it against, so it's always applied.
+			withoutBalance -= CHARGE;
+			withoutBalanceEl!.textContent = String(withoutBalance);
+			logEntry(withoutLogEl!, 'charged', `Attempt ${attempt}: charged $${CHARGE} (no way to tell this apart from a new request)`);
+
+			// "With a key": this click reuses the SAME key as every other click
+			// in this attempt (a real client would too, since it's retrying the
+			// same logical operation), so it only actually charges once.
+			if (processedKeys.has(currentKey)) {
+				logEntry(withLogEl!, 'deduped', `Attempt ${attempt}: skipped, key already processed`);
+			} else {
+				processedKeys.add(currentKey);
+				withBalance -= CHARGE;
+				withBalanceEl!.textContent = String(withBalance);
+				logEntry(withLogEl!, 'charged', `Attempt ${attempt}: charged $${CHARGE} (first time seeing this key)`);
+			}
+		});
+
+		resetButton.addEventListener('click', reset);
+
+		reset();
+	}
+
+	document.querySelectorAll<HTMLElement>('[data-idem-demo]').forEach(initDemo);
+</script>

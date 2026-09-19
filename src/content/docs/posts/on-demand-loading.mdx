@@ -6,7 +6,7 @@ tags: [Software Engineering, CS]
 
 import EagerVsLazyDemo from '../../../components/widgets/EagerVsLazyDemo.astro';
 
-{/* TODO: write the concept explanation here. Keep it tool-agnostic — the demo
+{/* TODO: write the concept explanation here. Keep it tool-agnostic: the demo
 below is deliberately generic (no real tool names), so the explanation should
 stay at the level of the general idea: load a resource only once it's
 actually needed, rather than paying for everything a system *could* use
@@ -20,6 +20,6 @@ up front. */}
 
 Three concrete instances of this same idea, at three different layers of a system:
 
-- [`import()` — MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import) — JavaScript's dynamic import, and the canonical rationale for it: skip the up-front cost when the code might not be needed.
-- [Code Splitting — webpack](https://webpack.js.org/guides/code-splitting/) — the same idea one layer up, applied to whole bundles rather than single modules.
-- [Beyond Physical Memory: Mechanisms — OSTEP, ch. 21](https://pages.cs.wisc.edu/~remzi/OSTEP/vm-beyondphys.pdf) — the OS-level version: demand paging, where a page only enters physical memory on first access.
+- [`import()` (MDN)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import): JavaScript's dynamic import, and the canonical rationale for it: skip the up-front cost when the code might not be needed.
+- [Code Splitting (webpack)](https://webpack.js.org/guides/code-splitting/): the same idea one layer up, applied to whole bundles rather than single modules.
+- [Beyond Physical Memory: Mechanisms (OSTEP, ch. 21)](https://pages.cs.wisc.edu/~remzi/OSTEP/vm-beyondphys.pdf): the OS-level version, demand paging, where a page only enters physical memory on first access.

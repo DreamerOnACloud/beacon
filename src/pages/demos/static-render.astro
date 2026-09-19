@@ -1,5 +1,5 @@
 ---
-// No `prerender` export — this page uses Astro's default: prerendered once,
+// No `prerender` export: this page uses Astro's default: prerendered once,
 // at build time. Every visitor gets the exact same HTML until the site is
 // rebuilt and redeployed.
 const renderedAt = new Date().toISOString();
@@ -40,7 +40,7 @@ const token = Math.random().toString(36).slice(2, 8);
 		</style>
 	</head>
 	<body>
-		<p class="label">Flyer — photocopied once, in advance</p>
+		<p class="label">Flyer: photocopied once, in advance</p>
 		<p class="value">Printed at: {renderedAt}</p>
 		<p class="token">Copy #: {token}</p>
 	</body>

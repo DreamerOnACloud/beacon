@@ -1,13 +1,13 @@
 ---
 title: Server-Side Rendering
-description: Same page, two different moments in time — when is the HTML actually built?
+description: Same page, two different moments in time, when is the HTML actually built?
 tags: [Software Engineering]
 ---
 
 import StaticVsSsrDemo from '../../../components/widgets/StaticVsSsrDemo.astro';
 
 {/* TODO: write the concept explanation here. This one gets a *real* demo
-rather than a simulation, unlike the on-demand-loading post — see idea.md's
+rather than a simulation, unlike the on-demand-loading post, see idea.md's
 rule for mechanism-type concepts. Keep the explanation itself agnostic to
 Astro/Netlify specifically; those are just what this site happens to be
 built with. The concept is: does the HTML get generated once, ahead of
@@ -15,7 +15,7 @@ time, or freshly, per request? */}
 
 ## Try it
 
-A flyer is photocopied once, in advance — whoever picks one up gets the same
+A flyer is photocopied once, in advance, whoever picks one up gets the same
 copy. A receipt is printed fresh, specifically for this transaction, the
 moment you check out. Both panes below run the exact same underlying
 mechanism as those two things. Hit "Reload" on each a few times.
@@ -24,6 +24,6 @@ mechanism as those two things. Hit "Reload" on each a few times.
 
 ## Further reading
 
-- [Rendering on the Web — web.dev](https://web.dev/articles/rendering-on-the-web) — the canonical explainer of SSR, client-side rendering, prerendering, and rehydration, with the performance trade-offs of each.
-- [Server-side rendering (SSR) — MDN Glossary](https://developer.mozilla.org/en-US/docs/Glossary/SSR) — a short, framework-neutral definition if you want the concise version first.
-- [On-demand rendering — Astro docs](https://docs.astro.build/en/guides/on-demand-rendering/) — how the mechanism behind the demo above actually works, if you want to see it end to end.
+- [Rendering on the Web (web.dev)](https://web.dev/articles/rendering-on-the-web): the canonical explainer of SSR, client-side rendering, prerendering, and rehydration, with the performance trade-offs of each.
+- [Server-side rendering (SSR) (MDN Glossary)](https://developer.mozilla.org/en-US/docs/Glossary/SSR): a short, framework-neutral definition if you want the concise version first.
+- [On-demand rendering (Astro docs)](https://docs.astro.build/en/guides/on-demand-rendering/): how the mechanism behind the demo above actually works, if you want to see it end to end.

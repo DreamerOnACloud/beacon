@@ -1,0 +1,28 @@
+---
+title: Idempotence
+description: Doing something twice by accident shouldn't be twice as bad.
+tags: [Software Engineering, Math]
+---
+
+import IdempotentPaymentDemo from '../../../components/widgets/IdempotentPaymentDemo.astro';
+
+{/* TODO: write the concept explanation here. The core idea: an operation is
+idempotent if applying it multiple times has the same effect as applying it
+once. Keep it tool-agnostic where the concept doesn't require a specific
+tool — this can be framed purely in terms of "repeating an action safely",
+before the demo below grounds it in the concrete case of retrying a
+payment request. */}
+
+## Try it
+
+Two accounts start with the same balance. Click "Pay $20" a few times in a
+row — like a user impatiently re-clicking a button that didn't respond fast
+enough — and watch what happens to each.
+
+<IdempotentPaymentDemo />
+
+## Further reading
+
+- [Idempotent requests — Stripe API docs](https://docs.stripe.com/api/idempotent_requests) — the industry-standard pattern this post's demo is modeled on: an `Idempotency-Key` header that lets a retried request safely replay the original result instead of repeating the effect.
+- [Idempotent — MDN Web Docs Glossary](https://developer.mozilla.org/en-US/docs/Glossary/Idempotent) — the concise, spec-level definition: why HTTP's GET/PUT/DELETE are idempotent by design and POST isn't.
+- [Idempotence — Wikipedia](https://en.wikipedia.org/wiki/Idempotence) — the general mathematical root of the property (`f(f(x)) = f(x)`), if you want to see the API case as one instance of something broader.

@@ -1,0 +1,36 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>0001 Why test beyond local</title><link rel="stylesheet" href="../assets/style.css"></head><body><main>
+<h1>Why test beyond your laptop?</h1>
+<p class="sub">Lesson 1 &middot; mission: justify the test-environment step &middot; about 5 minutes</p>
+
+<h2>Your colleague is right, with one sharpening</h2>
+<p>Your util works locally. What that proves: <em>your code agrees with your assumptions about everything around it.</em> A local run feeds it a URL you typed and JSON you wrote or mocked. The author of the code also authored its surroundings.</p>
+<p>A test environment replaces your assumptions with the real thing: the real API, the real gateway, the real CDN, real data. It answers a different question: <em>are my assumptions true?</em></p>
+<aside>This is the same idea behind <a href="https://12factor.net/dev-prod-parity">dev/prod parity</a> in the Twelve-Factor App: the bigger the gap between where you build and where it runs, the more bugs hide in the gap.</aside>
+
+<h2>What local cannot tell you, for your util</h2>
+<table>
+<tr><th>Assumption you made</th><th>Real-world way it breaks</th></tr>
+<tr><td>JSON shape matches my mock</td><td>Real API nests, renames or omits fields</td></tr>
+<tr><td>The query string reaches the page</td><td>Gateway, login redirect or router drops it</td></tr>
+<tr><td>Each URL gets its own response</td><td>CDN or cache ignores the query string</td></tr>
+<tr><td>Data contains the placeholders I expect</td><td>Real content has odd or missing ones</td></tr>
+</table>
+<p>Everything else, like decoding and replacing, a unit test handles faster. The <a href="https://testing.googleblog.com/2010/12/test-sizes.html">Google Testing Blog</a> makes the same split: small tests stay in one process, larger ones cross machines and networks. You want both.</p>
+
+<h2>Your two-sentence justification</h2>
+<p class="note">Local testing proves my code does what I think. Test-environment testing proves what I think is true of the real API, gateway and caches, which are the failures users actually hit.</p>
+<p>Honest limit: a test environment is not production. If its auth, data or caching differs, it can give false confidence. Parity is the thing to question, not the step.</p>
+
+<h2>Practice: where do you first see it?</h2>
+<p>Pick the cheapest place each problem becomes visible.</p>
+<div class="quiz" data-quiz="[{&quot;q&quot;: &quot;Is &lt;code&gt;\&quot;Hello {|color|}\&quot;&lt;/code&gt; with &lt;code&gt;?color=blue&lt;/code&gt; turned into &lt;code&gt;\&quot;Hello blue\&quot;&lt;/code&gt;?&quot;, &quot;opts&quot;: [&quot;Test environment run&quot;, &quot;Local unit test&quot;, &quot;Mocked local run&quot;], &quot;answer&quot;: 1, &quot;why&quot;: [&quot;Overkill: nothing external is involved, so a unit test is faster and sharper.&quot;, &quot;Pure string logic, no outside world involved.&quot;, &quot;A mock adds nothing here; the function alone answers it.&quot;]}, {&quot;q&quot;: &quot;The real API nests strings inside arrays that your hand-written mock never had. Where do you first see it?&quot;, &quot;opts&quot;: [&quot;Local unit test&quot;, &quot;Mocked local run&quot;, &quot;Test environment run&quot;], &quot;answer&quot;: 2, &quot;why&quot;: [&quot;Your test data only contains shapes you already imagined.&quot;, &quot;The mock was written from your assumption of the shape, so it agrees with you by construction.&quot;, &quot;Only the real backend shows you its real response shape.&quot;]}, {&quot;q&quot;: &quot;A login gateway redirects unauthenticated users and drops &lt;code&gt;?color&lt;/code&gt; from the URL. Where do you first see it?&quot;, &quot;opts&quot;: [&quot;Mocked local run&quot;, &quot;Test environment run&quot;, &quot;Local unit test&quot;], &quot;answer&quot;: 1, &quot;why&quot;: [&quot;Your mock has no gateway, so the URL arrives intact.&quot;, &quot;Gateways, redirects and auth only exist in the deployed setup.&quot;, &quot;A unit test passes the param in directly; no redirect ever happens.&quot;]}, {&quot;q&quot;: &quot;Does &lt;code&gt;?color=dark%20blue&lt;/code&gt; decode to a value with a space?&quot;, &quot;opts&quot;: [&quot;Local unit test&quot;, &quot;Test environment run&quot;, &quot;Mocked local run&quot;], &quot;answer&quot;: 0, &quot;why&quot;: [&quot;Decoding is deterministic code, easy to pin down in a unit test.&quot;, &quot;It would show up there too, but slowly and with more noise.&quot;, &quot;No external system is involved, so mocks add nothing.&quot;]}, {&quot;q&quot;: &quot;A CDN caches the page ignoring the query string, so everyone sees the first visitor&#x27;s color. Where do you first see it?&quot;, &quot;opts&quot;: [&quot;Mocked local run&quot;, &quot;Local unit test&quot;, &quot;Test environment run&quot;], &quot;answer&quot;: 2, &quot;why&quot;: [&quot;Your local server has no CDN in front of it.&quot;, &quot;Unit tests cannot contain a caching layer.&quot;, &quot;Caching rules live in the deployed infrastructure.&quot;]}]"></div>
+
+<h2>Do this next</h2>
+<p>Open your test environment with <code>?color=blue</code> and check three things: the real response shape, whether the param survives redirects, and whether a second color shows its own result.</p>
+
+<footer>
+<p><strong>Read:</strong> <a href="https://12factor.net/dev-prod-parity">The Twelve-Factor App, Dev/prod parity</a> (short).</p>
+<p><strong>Stuck?</strong> Ask your teacher (the agent) any follow-up question. Unclear terms are fine to ask about.</p>
+<p>Reference: <a href="../reference/glossary.html">Glossary</a></p>
+</footer></main><script src="../assets/quiz.js"></script></body></html>

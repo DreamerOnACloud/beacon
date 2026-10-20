@@ -1,0 +1,22 @@
+:root{--bg:#fffff8;--fg:#111;--muted:#666;--accent:#8a2be2;--ok:#1a7f37;--bad:#b42318;--rule:#ddd}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:18px/1.6 et-book,Palatino,"Palatino Linotype",Georgia,serif;margin:0;padding:3rem 1.25rem}
+main{max-width:40rem;margin:0 auto}
+h1{font-weight:400;font-size:2.2rem;line-height:1.2;margin:0 0 .25rem}
+h2{font-weight:400;font-style:italic;font-size:1.4rem;margin:2.5rem 0 .5rem}
+.sub{color:var(--muted);margin:0 0 2rem}
+a{color:var(--accent)}
+code{font:.85em ui-monospace,Menlo,monospace;background:#f1f0e6;padding:.1em .3em;border-radius:3px}
+aside,.note{border-left:3px solid var(--rule);padding:.25rem 1rem;color:var(--muted);margin:1.5rem 0}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{text-align:left;padding:.4rem .6rem;border-bottom:1px solid var(--rule);vertical-align:top}
+.quiz .q{margin:1.5rem 0;padding-bottom:1rem;border-bottom:1px solid var(--rule)}
+.quiz .opts{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
+.quiz button{font:inherit;font-size:.95rem;padding:.4rem .8rem;border:1px solid #bbb;background:#fff;border-radius:4px;cursor:pointer}
+.quiz button:hover:not(:disabled){border-color:var(--accent)}
+.quiz button.right{border-color:var(--ok);background:#e9f7ec}
+.quiz button.wrong{border-color:var(--bad);background:#fdecea}
+.quiz .fb{margin-top:.5rem;font-size:.95rem;color:var(--muted);min-height:1.2em}
+.score{font-style:italic;margin-top:1rem}
+footer{margin-top:3rem;font-size:.9rem;color:var(--muted)}
+@media print{body{background:#fff}.quiz button{border-color:#999}}

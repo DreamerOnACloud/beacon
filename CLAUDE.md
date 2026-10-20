@@ -1,14 +1,6 @@
 # beacon
 
-## Development
-
-Astro + Starlight. When starting the dev server, use background mode:
-
-```bash
-astro dev --background
-```
-
-Manage the background server with `astro dev stop`, `astro dev status`, and `astro dev logs`.
+Static learning content produced by the `/teach` skill. All of it lives in `learning/`; there is no build step or dev server. Open the HTML files directly in a browser.
 
 ## Git
 
@@ -22,14 +14,6 @@ git commit -m "..."
 
 When amending, add `--reset-author` (`git commit --amend` otherwise keeps the original author regardless of these env vars).
 
-Consult these guides before working on related tasks:
-
-- [Adding pages, dynamic routes, or middleware](https://docs.astro.build/en/guides/routing/)
-- [Working with Astro components](https://docs.astro.build/en/basics/astro-components/)
-- [Using React, Vue, Svelte, or other framework components](https://docs.astro.build/en/guides/framework-components/): not used in this project; widgets are vanilla Astro/JS by design, see `idea.md`
-- [Adding or managing content](https://docs.astro.build/en/guides/content-collections/)
-- [Adding styles or using Tailwind](https://docs.astro.build/en/guides/styling/)
-
 ## Agent skills
 
 ### Issue tracker
@@ -38,4 +22,4 @@ Issues/specs live as markdown files under `.scratch/<feature-slug>/`. See `docs/
 
 ### Domain docs
 
-Single-context: `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+Single-context: `GLOSSARY.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.

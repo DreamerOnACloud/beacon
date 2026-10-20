@@ -1,0 +1,14 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Glossary</title><link rel="stylesheet" href="../assets/style.css"></head><body><main>
+<h1>Glossary</h1><p class="sub">Test environments</p>
+<table>
+<tr><th>Term</th><th>Meaning</th></tr>
+<tr><td>Local</td><td>Your machine, with code, mocks and data you control.</td></tr>
+<tr><td>Test environment</td><td>A deployed copy of the system (real API, gateway, CDN) used to check real integration. Often called staging, QA or dev.</td></tr>
+<tr><td>Parity</td><td>How closely the test environment matches production in the behaviors that matter.</td></tr>
+<tr><td>Mock</td><td>A stand-in for a real dependency; only as true as its author's assumptions.</td></tr>
+<tr><td>Integration</td><td>Two or more real parts talking to each other.</td></tr>
+<tr><td>"Real integration"</td><td>Casual shorthand for integration testing against real deployed parts instead of mocks. Precise wording: "integration testing against the test environment". It is real integration with the test environment's version of the system, not with production.</td></tr>
+<tr><td>Local vs test env vs prod</td><td>Local: your assumptions, mocks you control. Test env: real deployed parts, but data, auth, caching and third-party services may differ. Prod: the real thing. To justify a claim, ask what differs from prod that could affect your feature.</td></tr>
+<tr><td>Unit test</td><td>Fast test of one piece of logic in one process.</td></tr>
+</table>
+<p><a href="../lessons/0001-why-test-beyond-local.html">Lesson 1</a></p></main></body></html>

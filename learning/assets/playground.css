@@ -1,0 +1,6 @@
+/* Optional frame for an interactive demo inside a lesson. Frame only: border, label, spacing.
+   Demo logic, controls and reset belong to the demo itself.
+   Usage: <div class="playground"><p class="playground-label">Try it</p><div class="playground-body">...</div></div> */
+.playground{margin-block:1.5rem;padding:1rem;border:1px solid #ddd;border-radius:.5rem;background:#f4f3ea}
+.playground-label{margin:0 0 .75rem;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--accent,#8a2be2)}
+.playground-body{color:var(--fg,#111)}
